@@ -1,0 +1,63 @@
+name: Playwright Tests
+on:
+  push:                                 //Workflow should be triggered on PUSH into DEVEOP branch
+    branches: [ develop ]
+    path-ignore:                    //Path-ignore controls that which file change should not trigger thw workflow
+      - '.gitignore'
+      - 'github/**'
+      - 'Report/**'
+
+
+workflow_dispatch:
+  inputs:
+    plan-id:
+      required: true
+      type: string
+      description: Enter PLan id
+      default: '773453'
+    suite-id:
+      required: true
+      type: string
+      description: Enter PLan id
+      default: '8743843,34343,45656565,453453'
+    env:
+      required: true
+      type: choice
+      description: Select environment
+      options:
+        - qa
+        - dev
+    file-name:
+      required: false
+      type: choice
+      description: Select file name or choose "null" to use manual entry
+      options: 
+        - .
+        - null
+        - Collibra/Collibra*              
+        - Catv3/Catv3*
+        - Catv3/Catv3_smoke_spec.js
+        - Catv3/Catv3_smoke_Critical.js
+
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npx playwright test
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
