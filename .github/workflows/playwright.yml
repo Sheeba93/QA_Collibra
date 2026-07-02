@@ -16,11 +16,12 @@ on:
           - dev
 
 
-
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+      TEST_ENV: ${{ github.event.inputs.env }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -38,3 +39,16 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+view-report:
+    needs: test   # ✅ run after tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+      - name: Publish Report URL
+        run: |
+          echo "### Playwright Report" >> $GITHUB_STEP_SUMMARY
+          echo "You can download and open the report locally:" >> $GITHUB_STEP_SUMMARY
+          echo "- Artifact: [Playwright Report](./playwright-report/index.html)" >> $GITHUB_STEP_SUMMARY
