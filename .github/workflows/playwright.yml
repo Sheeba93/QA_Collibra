@@ -4,6 +4,19 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+
+workflow_dispatch:
+  inputs:
+    env:
+      required: true
+      type: choice
+      description: Select environment
+      options:
+        - qa
+        - dev
+
+
+
 jobs:
   test:
     timeout-minutes: 60
