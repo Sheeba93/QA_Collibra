@@ -12,8 +12,8 @@ on:
         type: choice
         description: Select environment
         options:
-          - qa
-          - dev
+          - QA
+          - DEV
       tags:
         required: false
         type: string
