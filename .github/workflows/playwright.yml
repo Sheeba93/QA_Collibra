@@ -37,7 +37,16 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test --grep "${{ env.TEST_TAGS }}" --reporter=html
+      run: |
+        # If TEST_TAGS is provided, convert comma-separated list to a regex OR (a|b)
+        if [ -n "${TEST_TAGS}" ]; then
+          GREP=$(echo "${TEST_TAGS}" | sed 's/,/|/g')
+          echo "Running tests with grep=${GREP}"
+          npx playwright test --grep "${GREP}" --reporter=html
+        else
+          echo "Running all tests (no tags provided)"
+          npx playwright test --reporter=html
+        fi
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
